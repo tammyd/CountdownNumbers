@@ -30,49 +30,65 @@ class CountdownGame:
     def generate_pairs(self, numbers):
         return list(combinations(numbers, 2))
 
-    def apply_operations(self, x, y):
+    def apply_operations(self, x, y, current_numbers):
         results = []
         operations = []
 
-        results.append(self.add(x, y))
-        operations.append(f"{x} + {y} = {self.add(x, y)}")
+        # Addition
+        sum_result = self.add(x, y)
+        if sum_result not in current_numbers:
+            results.append(sum_result)
+            operations.append(f"{x} + {y} = {sum_result}")
 
+        # Subtraction
         if x >= y:
-            results.append(self.subtract(x, y))
-            operations.append(f"{x} - {y} = {self.subtract(x, y)}")
+            diff_result = self.subtract(x, y)
+            if diff_result not in current_numbers:
+                results.append(diff_result)
+                operations.append(f"{x} - {y} = {diff_result}")
         else:
-            results.append(self.subtract(y, x))
-            operations.append(f"{y} - {x} = {self.subtract(y, x)}")
+            diff_result = self.subtract(y, x)
+            if diff_result not in current_numbers:
+                results.append(diff_result)
+                operations.append(f"{y} - {x} = {diff_result}")
 
+        # Multiplication (skip if either number is 1)
         if x != 1 and y != 1:
-            results.append(self.multiply(x, y))
-            operations.append(f"{x} * {y} = {self.multiply(x, y)}")
+            product_result = self.multiply(x, y)
+            if product_result not in current_numbers:
+                results.append(product_result)
+                operations.append(f"{x} * {y} = {product_result}")
 
+        # Division (skip if division isn’t exact or if either number is 1)
         if y != 1 and self.divide(x, y) is not None:
-            results.append(self.divide(x, y))
-            operations.append(f"{x} / {y} = {self.divide(x, y)}")
+            div_result = self.divide(x, y)
+            if div_result not in current_numbers:
+                results.append(div_result)
+                operations.append(f"{x} / {y} = {div_result}")
         elif x != 1 and self.divide(y, x) is not None:
-            results.append(self.divide(y, x))
-            operations.append(f"{y} / {x} = {self.divide(y, x)}")
+            div_result = self.divide(y, x)
+            if div_result not in current_numbers:
+                results.append(div_result)
+                operations.append(f"{y} / {x} = {div_result}")
 
         return results, operations
 
     def find_closest_solution(self, numbers, target):
-        # BFS initialization
-        queue = deque([(numbers, [], 0)])  # (current numbers, operations so far, current difference)
+        queue = deque([(numbers, [], 0)])  # Queue of (current numbers, operations so far, current difference)
         visited = set()  # Track visited states to avoid repeats
         best_solution = None
         best_steps = []
         best_difference = float("inf")
 
         while queue:
+            # Get the current state from the front of the queue
             current_numbers, steps, current_difference = queue.popleft()
 
-            # Check if target is directly reachable
+            # If the target is in the current numbers, return it immediately as the solution
             if target in current_numbers:
-                return target, steps  # Solution found
+                return target, steps
 
-            # Add the state to visited
+            # Track the state to avoid re-processing it
             state = tuple(sorted(current_numbers))
             if state in visited:
                 continue
@@ -80,8 +96,10 @@ class CountdownGame:
 
             # Generate pairs and apply operations to create new states
             for (x, y) in self.generate_pairs(current_numbers):
-                results, operations = self.apply_operations(x, y)
+                # Pass `current_numbers` to apply_operations to limit redundant operations
+                results, operations = self.apply_operations(x, y, current_numbers)
 
+                # For each operation result, create a new state and add it to the queue
                 for result, operation in zip(results, operations):
                     new_numbers = [num for num in current_numbers if num != x and num != y] + [result]
                     new_steps = steps + [operation]
@@ -93,7 +111,8 @@ class CountdownGame:
                         best_steps = new_steps
                         best_difference = new_difference
 
-                    # Add new state to the queue if it hasn't been visited
+                    # Add the new state to the queue
                     queue.append((new_numbers, new_steps, new_difference))
 
         return best_solution, best_steps
+
