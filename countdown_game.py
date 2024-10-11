@@ -1,6 +1,5 @@
-from functools import lru_cache
-import random
 from itertools import combinations
+from collections import deque
 
 class CountdownGame:
     def __init__(self):
@@ -58,58 +57,43 @@ class CountdownGame:
 
         return results, operations
 
-    def find_closest_solution(self, numbers, target, max_depth=5, use_cache=True):
-        if use_cache:
-            # Use the cached helper
-            best_solution, best_steps = self._find_closest_solution_cached(tuple(numbers), target, float('inf'), max_depth, 0, tuple())
-        else:
-            # Call the helper without caching
-            best_solution, best_steps = self._find_closest_solution(tuple(numbers), target, float('inf'), max_depth, 0, tuple())
-        return best_solution, best_steps
+    def find_closest_solution(self, numbers, target):
+        # BFS initialization
+        queue = deque([(numbers, [], 0)])  # (current numbers, operations so far, current difference)
+        visited = set()  # Track visited states to avoid repeats
+        best_solution = None
+        best_steps = []
+        best_difference = float("inf")
 
-    def _find_closest_solution(self, numbers, target, best_difference, max_depth, depth, steps):
-        # Non-cached version of the solution
-        return self._find_closest_solution_core(numbers, target, best_difference, max_depth, depth, steps)
+        while queue:
+            current_numbers, steps, current_difference = queue.popleft()
 
-    @lru_cache(maxsize=1000)
-    def _find_closest_solution_cached(self, numbers, target, best_difference, max_depth, depth, steps):
-        # Cached version of the solution
-        return self._find_closest_solution_core(numbers, target, best_difference, max_depth, depth, steps)
+            # Check if target is directly reachable
+            if target in current_numbers:
+                return target, steps  # Solution found
 
-    def _find_closest_solution_core(self, numbers, target, best_difference, max_depth, depth, steps):
-        # Core logic shared by both cached and non-cached versions
-        numbers = list(numbers)
-        best_solution = numbers[0] if numbers else None
-        best_steps = list(steps)
+            # Add the state to visited
+            state = tuple(sorted(current_numbers))
+            if state in visited:
+                continue
+            visited.add(state)
 
-        if target in numbers:
-            return target, best_steps
+            # Generate pairs and apply operations to create new states
+            for (x, y) in self.generate_pairs(current_numbers):
+                results, operations = self.apply_operations(x, y)
 
-        if len(numbers) == 1 or depth >= max_depth:
-            difference = abs(numbers[0] - target)
-            if difference < best_difference:
-                return numbers[0], best_steps
-            return best_solution, best_steps
+                for result, operation in zip(results, operations):
+                    new_numbers = [num for num in current_numbers if num != x and num != y] + [result]
+                    new_steps = steps + [operation]
+                    new_difference = abs(result - target)
 
-        pairs = self.generate_pairs(numbers)
+                    # Update the best solution if this is closer
+                    if new_difference < best_difference:
+                        best_solution = result
+                        best_steps = new_steps
+                        best_difference = new_difference
 
-        for (x, y) in pairs:
-            results, operations = self.apply_operations(x, y)
-
-            for result, operation in zip(results, operations):
-                new_steps = best_steps + [operation]
-                new_numbers = [num for num in numbers if num != x and num != y]
-                new_numbers.append(result)
-
-                solution, solution_steps = (
-                    self._find_closest_solution_cached(tuple(new_numbers), target, best_difference, max_depth, depth + 1, tuple(new_steps))
-                    if steps
-                    else self._find_closest_solution(tuple(new_numbers), target, best_difference, max_depth, depth + 1, tuple(new_steps))
-                )
-
-                if solution is not None:
-                    current_difference = abs(solution - target)
-                    if current_difference < best_difference:
-                        best_solution, best_difference, best_steps = solution, current_difference, solution_steps
+                    # Add new state to the queue if it hasn't been visited
+                    queue.append((new_numbers, new_steps, new_difference))
 
         return best_solution, best_steps
