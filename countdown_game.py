@@ -71,7 +71,7 @@ class CountdownGame:
         # Non-cached version of the solution
         return self._find_closest_solution_core(numbers, target, best_difference, max_depth, depth, steps)
 
-    @lru_cache(None)
+    @lru_cache(maxsize=1000)
     def _find_closest_solution_cached(self, numbers, target, best_difference, max_depth, depth, steps):
         # Cached version of the solution
         return self._find_closest_solution_core(numbers, target, best_difference, max_depth, depth, steps)
