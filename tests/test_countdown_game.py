@@ -1,6 +1,7 @@
 import unittest
 from ..countdown_game import CountdownGame
 
+
 class TestCountdownGame(unittest.TestCase):
     def setUp(self):
         self.game = CountdownGame()
@@ -60,6 +61,7 @@ class TestCountdownGame(unittest.TestCase):
         numbers = [100, 75, 50, 25, 10, 5]
         solution, steps = self.game.find_closest_solution(numbers, target)
         self.assertLessEqual(abs(solution - target), 20)
+
 
 if __name__ == "__main__":
     unittest.main()

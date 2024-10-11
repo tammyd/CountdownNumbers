@@ -2,6 +2,7 @@ from itertools import combinations
 from collections import deque
 import random
 
+
 class CountdownGame:
     def __init__(self):
         self.large_numbers = [25, 50, 75, 100]
@@ -75,7 +76,9 @@ class CountdownGame:
         return results, operations
 
     def find_closest_solution(self, numbers, target):
-        queue = deque([(numbers, [], 0)])  # Queue of (current numbers, operations so far, current difference)
+        queue = deque(
+            [(numbers, [], 0)]
+        )  # Queue of (current numbers, operations so far, current difference)
         visited = set()  # Track visited states to avoid repeats
         best_solution = None
         best_steps = []
@@ -96,13 +99,15 @@ class CountdownGame:
             visited.add(state)
 
             # Generate pairs and apply operations to create new states
-            for (x, y) in self.generate_pairs(current_numbers):
+            for x, y in self.generate_pairs(current_numbers):
                 # Pass `current_numbers` to apply_operations to limit redundant operations
                 results, operations = self.apply_operations(x, y, current_numbers)
 
                 # For each operation result, create a new state and add it to the queue
                 for result, operation in zip(results, operations):
-                    new_numbers = [num for num in current_numbers if num != x and num != y] + [result]
+                    new_numbers = [
+                        num for num in current_numbers if num != x and num != y
+                    ] + [result]
                     new_steps = steps + [operation]
                     new_difference = abs(result - target)
 
@@ -116,4 +121,3 @@ class CountdownGame:
                     queue.append((new_numbers, new_steps, new_difference))
 
         return best_solution, best_steps
-

@@ -1,9 +1,11 @@
 import time
 import argparse
+
 try:
     from .countdown_game import CountdownGame
 except ImportError:
     from countdown_game import CountdownGame
+
 
 def main():
     # Parse command-line arguments
@@ -11,22 +13,22 @@ def main():
     parser.add_argument(
         "--target",
         type=int,
-        help="The target number to reach (required if --numbers is provided)."
+        help="The target number to reach (required if --numbers is provided).",
     )
     parser.add_argument(
         "--numbers",
         type=str,
-        help="A comma-separated or space-separated list of 6 numbers to use."
+        help="A comma-separated or space-separated list of 6 numbers to use.",
     )
     parser.add_argument(
         "--big",
         type=int,
-        help="Number of big numbers to use (25, 50, 75, 100). Must be non-negative."
+        help="Number of big numbers to use (25, 50, 75, 100). Must be non-negative.",
     )
     parser.add_argument(
         "--small",
         type=int,
-        help="Number of small numbers to use (1–10). Must be non-negative."
+        help="Number of small numbers to use (1–10). Must be non-negative.",
     )
     args = parser.parse_args()
 
@@ -35,7 +37,9 @@ def main():
     max_big_numbers = 4
 
     # Validate non-negative values for `--big` and `--small`
-    if (args.big is not None and args.big < 0) or (args.small is not None and args.small < 0):
+    if (args.big is not None and args.big < 0) or (
+        args.small is not None and args.small < 0
+    ):
         print("Error: --big and --small must be non-negative integers.")
         return
 
@@ -53,7 +57,9 @@ def main():
 
     # Validate that the total count of big and small numbers equals six
     if num_large + num_small != total_numbers or num_large > max_big_numbers:
-        print(f"Error: Invalid number of big or small numbers. You must choose a total of {total_numbers} numbers, with up to {max_big_numbers} big numbers.")
+        print(
+            f"Error: Invalid number of big or small numbers. You must choose a total of {total_numbers} numbers, with up to {max_big_numbers} big numbers."
+        )
         return
 
     game = CountdownGame()
@@ -65,10 +71,14 @@ def main():
         numbers = list(map(int, args.numbers.replace(",", " ").split()))
     elif args.big is not None or args.small is not None:
         # Automatically generate random numbers if --big or --small is specified
-        target, numbers = game.generate_countdown_numbers(num_large=num_large, num_small=num_small)
+        target, numbers = game.generate_countdown_numbers(
+            num_large=num_large, num_small=num_small
+        )
     else:
         # Default values to prevent interactive mode
-        target, numbers = game.generate_countdown_numbers(num_large=num_large, num_small=num_small)
+        target, numbers = game.generate_countdown_numbers(
+            num_large=num_large, num_small=num_small
+        )
 
     print(f"\nTarget: {target}")
     print(f"Numbers: {numbers}")
@@ -85,6 +95,7 @@ def main():
     for step in steps:
         print(step)
     print(f"\nTime taken: {elapsed_time:.4f} seconds")
+
 
 if __name__ == "__main__":
     main()
