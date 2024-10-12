@@ -28,17 +28,21 @@ pip install pytest
 
 ### Command-Line Interface
 
-You can use the CLI to solve Countdown problems by specifying the target number and six numbers or letting it generate them randomly:
+You can use the CLI to solve Countdown problems by specifying the target number and six numbers directly, or letting it generate them randomly.
 
 ```bash
 python countdown_cli.py --target 789 --numbers "100, 75, 50, 25, 10, 1"
 ```
 
-Alternatively, generate random numbers with a custom split of big and small numbers:
+Alternatively, you can generate random numbers with a custom split of big and small numbers:
 
 ```bash
 python countdown_cli.py --big 2 --small 4
 ```
+
+If no arguments are provided, the CLI will prompt you to either:
+1. Generate random numbers and a target.
+2. Enter a target number and six numbers manually.
 
 ### Arguments
 
@@ -55,6 +59,8 @@ pytest tests/test_countdown_game.py
 ```
 
 This command will execute the tests and confirm the accuracy and reliability of the game logic.
+
+---
 
 ## Human Disclaimer
 

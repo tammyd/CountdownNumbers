@@ -64,18 +64,27 @@ def main():
 
     game = CountdownGame()
 
-    # Determine target and numbers based on provided arguments or user input
-    if args.target and args.numbers:
+    # Check if the user specified enough information; otherwise, prompt
+    if not args.target and not args.numbers and not args.big and not args.small:
+        # Prompt for random generation if no numbers or target are specified
+        choice = input("Generate random numbers and target? (y/n): ").strip().lower()
+        if choice == "y":
+            target, numbers = game.generate_countdown_numbers(
+                num_large=num_large, num_small=num_small
+            )
+        else:
+            # Manual entry if the user does not want random generation
+            target = int(input("Enter the target number: "))
+            numbers_input = input(
+                "Enter 6 numbers separated by spaces or commas: "
+            ).replace(",", " ")
+            numbers = list(map(int, numbers_input.split()))
+    elif args.target and args.numbers:
         # Use specified target and numbers directly
         target = args.target
         numbers = list(map(int, args.numbers.replace(",", " ").split()))
-    elif args.big is not None or args.small is not None:
-        # Automatically generate random numbers if --big or --small is specified
-        target, numbers = game.generate_countdown_numbers(
-            num_large=num_large, num_small=num_small
-        )
     else:
-        # Default values to prevent interactive mode
+        # Automatically generate random numbers if --big or --small is specified
         target, numbers = game.generate_countdown_numbers(
             num_large=num_large, num_small=num_small
         )
