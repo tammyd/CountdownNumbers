@@ -62,6 +62,16 @@ class TestCountdownGame(unittest.TestCase):
         solution, steps = self.game.find_closest_solution(numbers, target)
         self.assertLessEqual(abs(solution - target), 20)
 
+    def test_division_not_in_current_numbers(self):
+        """Test a division operation where the result is not in current numbers and y != 1."""
+        x, y = 10, 2
+        current_numbers = [10, 2, 5]  # Ensure the division result (5) is not added again
+
+        results, operations = self.game.apply_operations(x, y, current_numbers)
+
+        # Check that division was skipped because 5 already exists in current_numbers
+        self.assertNotIn("10 / 2 = 5", operations)
+
 
 if __name__ == "__main__":
     unittest.main()
